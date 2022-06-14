@@ -30,7 +30,7 @@ class MainWidget(QtWidgets.QWidget):
         self.robot = Robot(print_debug = True)
         self.robot.start()
         self.fonts = "Comic Sans MS"
-        self.game = Game()
+        self.game = Game(1)
 
         #uic.loadUi('basic.ui', self)  # Load the .ui file
         self.__init_std_group()
@@ -193,10 +193,9 @@ class MainWidget(QtWidgets.QWidget):
         self.robot.send_step(hole[0], hole[1])
 
 def closeEvent(event):
-    main_widget.robot.stop()
-    del(main_widget.robot)
-    del(main_widget.game)
-
+    #main_widget.robot.stop()
+    del main_widget.robot 
+    del main_widget.game
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -207,4 +206,5 @@ if __name__ == "__main__":
     main_window.setCentralWidget(main_widget)
     main_window.showMaximized()
     main_window.closeEvent = closeEvent
+
     sys.exit(app.exec_())

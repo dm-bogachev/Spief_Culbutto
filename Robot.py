@@ -38,6 +38,9 @@ class Robot(Thread):
     def __print(self, msg):
         if self.debug: print(msg)
 
+    def __del__(self):
+        self.perm_stop = True
+
     def run(self):
         self.__thread()
         self.__print("RobotData thread started")

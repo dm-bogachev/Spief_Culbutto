@@ -17,7 +17,7 @@ class Game(QtCore.QObject):
 
     def __init__(self, camera_port=0, parent=None):
         super().__init__(parent)
-        self.camera = Camera()
+        self.camera = Camera(camera_port)
         #
         self.cv = CVProcess()
         self.l = Logic()
@@ -57,3 +57,6 @@ class Game(QtCore.QObject):
             self.hole_data.emit(str(hole))
             self.score_data.emit(str(score))
             self.hole = hole
+
+    def __del__(self):
+        self.timer.stop()
