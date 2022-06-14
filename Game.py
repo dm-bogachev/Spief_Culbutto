@@ -1,5 +1,4 @@
 import random
-from time import sleep
 import numpy as np
 from CVProcess import CVProcess
 from Camera import Camera
@@ -20,21 +19,18 @@ class Game(QtCore.QObject):
         super().__init__(parent)
         self.camera = Camera()
         #
-        pts_src = [(916, 287), (579, 608), (901, 943), (1235, 620)]
-        self.cv = CVProcess(pts_src)
+        self.cv = CVProcess()
         self.l = Logic()
         self.original_image = None
         self.corrected_image = None
-        self.brightness = 200
-        self.contrast = 235
         self.timer = QtCore.QBasicTimer()
         self.timer.start(0, self)
         self.hole = None
-
-    def set_correction_parameters(self, brightness, contrast):
+    '''
+    def set_correction_parameters(self, brightness, contrast): # Не используется
         self.brightness = brightness
         self.contrast = contrast
-
+    ''' 
     def get_hole(self):
         return self.hole
 
@@ -52,7 +48,7 @@ class Game(QtCore.QObject):
         frame = self.camera.get_image()
         if frame is not None:
             # Process frame
-            self.original_image, self.corrected_image = self.cv.process(frame, self.brightness, self.contrast)
+            self.original_image, self.corrected_image = self.cv.process(frame)
             # Game logic
             self.corrected_image, hole, score = self.l.process(self.corrected_image)
             # Emit info
@@ -61,5 +57,3 @@ class Game(QtCore.QObject):
             self.hole_data.emit(str(hole))
             self.score_data.emit(str(score))
             self.hole = hole
-
-

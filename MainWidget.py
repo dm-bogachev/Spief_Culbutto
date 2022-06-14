@@ -193,10 +193,9 @@ class MainWidget(QtWidgets.QWidget):
         self.robot.send_step(hole[0], hole[1])
 
 def closeEvent(event):
-    #main_widget.robot.stop()
-    #del(main_widget.robot)
-    #del(main_widget.game)
-    time.sleep(1000)
+    main_widget.robot.stop()
+    del(main_widget.robot)
+    del(main_widget.game)
 
 
 if __name__ == "__main__":
