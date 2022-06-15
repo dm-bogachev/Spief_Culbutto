@@ -30,14 +30,19 @@ class MainWidget(QtWidgets.QWidget):
         self.robot = Robot(print_debug = True)
         self.robot.start()
         self.fonts = "Comic Sans MS"
-        self.game = Game(1)
-
+        self.game = Game(0)
+        self.rw_count = 0
+        self.pw_count = 0
+        
+            #line
         #uic.loadUi('basic.ui', self)  # Load the .ui file
-        self.__init_std_group()
-        self.__init_kick_group()
+        
         self.__init_control_buttons()
         self.__init_imshow()
         self.__init_score()
+        self.__init_std_group()
+        self.__init_kick_group()
+        self.__init_manual_count()
         # self.btn_start = QPushButton("START")
         # self.btn_start.clicked.connect(partial(self.__send_command, None, None))
         
@@ -57,12 +62,35 @@ class MainWidget(QtWidgets.QWidget):
         vid_layout = QtWidgets.QHBoxLayout()
         vid_layout.addWidget(self.oiw)
         vid_layout.addWidget(self.ciw)
+        vid_layout.addWidget(self.mcg)
         vid.setLayout(vid_layout)
 
 
         main_layout.addWidget(qb)
         main_layout.addWidget(vid)
         self.setLayout(main_layout)
+
+        try:
+            with open("saved.txt", "r") as input:
+                line = input.readline().replace("[", "").replace("]", "").split(',')#.write(str([self.rw_count, self.pw_count]))
+                self.rw_count = int(line[0])
+                self.pw_count = int(line[1])
+                self.lcd_rw.display(self.rw_count)
+                self.lcd_pw.display(self.pw_count)
+        except : pass
+
+    def __rwadd(self):
+        self.rw_count = self.rw_count + 1
+        self.lcd_rw.display(self.rw_count)
+        with open("saved.txt", "w") as output:
+            output.write(str([self.rw_count, self.pw_count]))
+
+    def __pwadd(self):
+        self.pw_count = self.pw_count + 1
+        self.lcd_pw.display(self.pw_count)
+        with open("saved.txt", "w") as output:
+            output.write(str([self.rw_count, self.pw_count]))
+
 
     def brightness_slider_changed(self):
         self.game.set_correction_parameters(
@@ -71,6 +99,30 @@ class MainWidget(QtWidgets.QWidget):
     def contrast_slider_changed(self):
         self.game.set_correction_parameters(
             self.brightness_trackbar.value(), self.contrast_trackbar.value())
+
+
+    def __init_manual_count(self):
+        self.mcg = QGroupBox("Ручной счётчик побед")
+        self.mcgl = QGridLayout()
+        self.btn_rw = QPushButton("Победа робота")
+        self.btn_rw.setMinimumHeight(200)
+        #self.btn_rw.setFixedSize(100, 80)
+        self.btn_rw.clicked.connect(self.__rwadd)
+        self.lcd_rw = QLCDNumber()
+        self.lcd_rw.setDigitCount(3)
+        self.btn_pw = QPushButton("Победа человека")
+        self.btn_pw.setMinimumHeight(200)
+        # self.btn_pw.setFixedSize(100, 80)
+        self.btn_pw.clicked.connect(self.__pwadd)
+        self.lcd_pw = QLCDNumber()
+        self.lcd_pw.setDigitCount(3)
+        self.mcgl.addWidget(self.btn_rw, 0,0)
+        self.mcgl.addWidget(self.btn_pw, 0,1)
+        self.mcgl.addWidget(self.lcd_rw, 1,0)
+        self.mcgl.addWidget(self.lcd_pw, 1,1)
+        #lay.addWidget(btn_pw)
+        self.mcg.setFont(QtGui.QFont(self.fonts, 16, QtGui.QFont.Bold))
+        self.mcg.setLayout(self.mcgl)
 
     def __init_std_group(self):
         all_index = ([(0, -2)], [(1, -1), (0, -1), (-1, -1)], [(2, 0), (1, 0),
@@ -84,6 +136,7 @@ class MainWidget(QtWidgets.QWidget):
                 button = QPushButton(f'{index[0]} {index[1]}')
                 button.setFixedSize(100, 80)
                 button.clicked.connect(partial(self.__send_command, index, 0))
+                button.clicked.connect(self.btn_auto.setFocus)
                 self.std_grid.addWidget(button, 6-index[0], index[1])
         self.std_group.setLayout(self.std_grid)
         self.std_group.setFont(QtGui.QFont(self.fonts, 16, QtGui.QFont.Bold))
