@@ -30,7 +30,7 @@ class MainWidget(QtWidgets.QWidget):
         self.robot = Robot(print_debug = True)
         self.robot.start()
         self.fonts = "Comic Sans MS"
-        self.game = Game(0)
+        self.game = Game(1)
         self.rw_count = 0
         self.pw_count = 0
         
